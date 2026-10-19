@@ -97,6 +97,10 @@ def run_task(
             "tool_calls": [],
         }
 
+        # 顺序必须为 assistant(tool_calls) -> tool：OpenAI 消息格式要求每条
+        # tool 消息紧跟其对应的 assistant tool_calls 消息，否则接口报 400。
+        history.append(assistant_message)
+
         for call in step.tool_calls:
             call_id = call.id or f"call_{uuid.uuid4().hex[:8]}"
             assistant_message["tool_calls"].append(
@@ -130,7 +134,6 @@ def run_task(
                 }
             )
 
-        history.append(assistant_message)
         result.steps.append(record)
 
     result.latency_ms = (time.perf_counter() - started) * 1000

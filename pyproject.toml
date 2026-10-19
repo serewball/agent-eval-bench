@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "agent-eval-bench"
-version = "0.2.0"
+version = "0.3.0"
 description = "轻量级 Agent 评测台：Pass@k / Pass^k / 过程指标 / 失败归因"
 readme = "README.md"
 requires-python = ">=3.10"

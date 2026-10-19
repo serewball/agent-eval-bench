@@ -8,7 +8,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from evalbench.metrics import pass_at_k, pass_pow_k  # noqa: E402
+from evalbench.metrics import pass_at_k, pass_pow_k, percentile  # noqa: E402
 
 
 class TestPassAtK(unittest.TestCase):
@@ -50,6 +50,30 @@ class TestReliabilityGap(unittest.TestCase):
         """同一份数据下，Pass@k 不应低于 Pass^k。"""
         n, c, k = 10, 7, 5
         self.assertGreater(pass_at_k(n, c, k), pass_pow_k(n, c, k))
+
+
+class TestPercentile(unittest.TestCase):
+    def test_empty(self) -> None:
+        self.assertEqual(percentile([], 95), 0.0)
+
+    def test_single(self) -> None:
+        self.assertEqual(percentile([42.0], 95), 42.0)
+
+    def test_linear_interpolation(self) -> None:
+        # 与 numpy.percentile(..., method="linear") 口径一致
+        self.assertAlmostEqual(percentile([1, 2, 3, 4], 50), 2.5)
+        self.assertAlmostEqual(percentile([1, 2, 3, 4], 75), 3.25)
+
+    def test_p95_not_always_max(self) -> None:
+        # 线性插值下，P95 不应退化为最大值（除非样本极少）
+        values = [float(i) for i in range(100)]
+        self.assertLess(percentile(values, 95), 99.0)
+        self.assertGreater(percentile(values, 95), 94.0)
+
+    def test_small_sample_is_close_to_max(self) -> None:
+        # n=10 时 P95 接近最大值是分位数数学性质，明示为预期行为
+        values = [float(i) for i in range(10)]
+        self.assertGreater(percentile(values, 95), 8.0)
 
 
 if __name__ == "__main__":

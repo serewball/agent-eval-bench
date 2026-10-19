@@ -37,11 +37,21 @@ def pass_pow_k(n: int, c: int, k: int) -> float:
 
 
 def percentile(values: List[float], p: float) -> float:
+    """线性插值分位数（与 numpy 的 linear 方法口径一致）。
+
+    注意：样本量很小时（如 n=10）P95 会非常接近最大值，这是分位数本身
+    的数学性质，不是实现错误——报告里应同时看均值与 P95。
+    """
     if not values:
         return 0.0
     ordered = sorted(values)
-    index = min(len(ordered) - 1, max(0, int(round((p / 100) * (len(ordered) - 1)))))
-    return ordered[index]
+    if len(ordered) == 1:
+        return ordered[0]
+    rank = (p / 100.0) * (len(ordered) - 1)
+    lo = int(rank)
+    hi = lo + 1
+    frac = rank - lo
+    return ordered[lo] * (1.0 - frac) + ordered[hi] * frac
 
 
 @dataclass

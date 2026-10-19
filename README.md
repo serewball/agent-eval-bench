@@ -1,8 +1,19 @@
 # agent-eval-bench
 
+<p align="center">
+  <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-blue">
+  <img alt="deps" src="https://img.shields.io/badge/deps-zero%20dependency-brightgreen">
+  <img alt="license" src="https://img.shields.io/badge/license-MIT-green">
+  <img alt="CI" src="https://github.com/<your-name>/agent-eval-bench/workflows/CI/badge.svg">
+</p>
+
 轻量级 Agent 评测台：喂进你的任务集，跑出 **Pass@k / Pass^k / 过程指标 / 成本账单 / 失败归因**。
 
 不做 Agent 框架，只回答一个问题：**这个 Agent 到底能不能用？**
+
+<p align="center">
+  <img src="docs/preview.png" alt="评测看板预览" width="640">
+</p>
 
 ---
 
@@ -91,7 +102,7 @@ python -m evalbench judge
 |------|------|
 | 工具错误率 | 参数非法、对象不存在导致的调用失败 |
 | 越权调用率 | 调用了任务明确禁止的工具 |
-| 确认合规率 | 高风险写操作前是否调用了 `request_confirmation` |
+| 确认合规率 | 第一个写操作之前是否已调用 `request_confirmation`（只看"调没调过"会被先写后补确认的轨迹蒙混） |
 | 平均步数 | 路径效率，异常升高通常意味着反复试错 |
 | 平均 token / 成本 | 端到端花费，按可配置单价估算 |
 | P95 延迟 | 尾延迟，比均值更能反映用户体验 |
@@ -207,6 +218,7 @@ LangGraph、AutoGen 已经够多了。评测工具的价值在于**中立**—�
 ## 已知局限
 
 - Mock 模式的 token 数是字符估算，真实模型请以接口返回 `usage` 为准；延迟只代表本地脚本开销。
+- P95 采用线性插值口径；样本量很小（如 n=10）时 P95 会接近最大值，这是分位数数学性质，报告里应同时看均值与 P95。
 - 失败归因是启发式规则（禁止调用 > 参数不符 > 缺少确认 > 首个写操作），不是轨迹模型推理。
 - 断言覆盖最终状态与关键工具调用，**不评估中间推理质量**。
 - 数据集为虚构供应链场景，仅用于演示方法论，不代表真实业务分布。
@@ -217,9 +229,9 @@ LangGraph、AutoGen 已经够多了。评测工具的价值在于**中立**—�
 ## Roadmap
 
 - [x] LLM-as-Judge 判分（rubric + 人工金标校准 kappa）
+- [x] 与 CI 集成，多平台回归（ubuntu / windows）
 - [ ] 判分器多模型投票（降低单模型偏见）
 - [ ] 并发执行与断点续跑
-- [ ] 与 CI 集成，回归对比上一次基线
 - [ ] 轨迹回放视图（按步骤查看 observation）
 
 ## License

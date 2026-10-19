@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ["3.10", "3.12"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: 单元测试（指标 / 判分 / 校准 / 轨迹协议）
+        run: python -m unittest discover -s tests
+
+      - name: 端到端演示（零依赖 mock 基线）
+        run: python -m evalbench demo
+
+      - name: 判分器校准（金标集 + Cohen's kappa）
+        run: python -m evalbench calibrate
+
+      - name: 规则 vs 语义判分一致性
+        run: python -m evalbench judge
