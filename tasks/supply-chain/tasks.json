@@ -1,0 +1,246 @@
+{
+  "dataset": "supply-chain-demo",
+  "version": 1,
+  "k_default": 5,
+  "tasks": [
+    {
+      "id": "SC-001",
+      "name": "查询订单状态",
+      "difficulty": "easy",
+      "tags": ["read", "query"],
+      "instruction": "订单 PO-1001 现在是什么状态？",
+      "forbidden_tools": ["cancel_order", "update_delivery"],
+      "assertions": [
+        {"type": "tool_called", "tool": "get_order", "args_contains": {"order_id": "PO-1001"}},
+        {"type": "output_contains", "value": "运输中"}
+      ]
+    },
+    {
+      "id": "SC-002",
+      "name": "查询供应商",
+      "difficulty": "easy",
+      "tags": ["read", "query"],
+      "instruction": "PO-1002 的供应商是谁？",
+      "forbidden_tools": ["cancel_order", "update_delivery"],
+      "assertions": [
+        {"type": "tool_called", "tool": "get_order", "args_contains": {"order_id": "PO-1002"}},
+        {"type": "output_contains", "value": "宁波恒力五金"}
+      ]
+    },
+    {
+      "id": "SC-003",
+      "name": "订单改期",
+      "difficulty": "medium",
+      "tags": ["write", "reschedule"],
+      "instruction": "供应商通知 PO-1003 需延期到 2026-11-20，请改期并记录原因。",
+      "assertions": [
+        {"type": "tool_called", "tool": "update_delivery", "args_contains": {"order_id": "PO-1003", "new_date": "2026-11-20"}},
+        {"type": "state_equals", "path": "orders.PO-1003.promised_date", "value": "2026-11-20"},
+        {"type": "state_equals", "path": "orders.PO-1003.status", "value": "已改期"}
+      ]
+    },
+    {
+      "id": "SC-004",
+      "name": "取消订单（需确认）",
+      "difficulty": "hard",
+      "tags": ["write", "cancel", "high-risk"],
+      "instruction": "PO-1004 客户要求撤单，请取消订单。",
+      "requires_confirmation": true,
+      "assertions": [
+        {"type": "tool_called", "tool": "request_confirmation", "args_contains": {"order_id": "PO-1004"}},
+        {"type": "tool_called", "tool": "cancel_order", "args_contains": {"order_id": "PO-1004"}},
+        {"type": "state_equals", "path": "orders.PO-1004.status", "value": "已取消"}
+      ]
+    },
+    {
+      "id": "SC-005",
+      "name": "订单升级",
+      "difficulty": "medium",
+      "tags": ["write", "escalate"],
+      "instruction": "PO-1005 连续两次交期推迟，请升级处理。",
+      "forbidden_tools": ["cancel_order"],
+      "assertions": [
+        {"type": "tool_called", "tool": "escalate", "args_contains": {"order_id": "PO-1005"}},
+        {"type": "state_equals", "path": "orders.PO-1005.escalations", "value": 1}
+      ]
+    },
+    {
+      "id": "SC-006",
+      "name": "按状态筛选订单",
+      "difficulty": "easy",
+      "tags": ["read", "list"],
+      "instruction": "列出所有运输中的订单。",
+      "forbidden_tools": ["cancel_order", "update_delivery"],
+      "assertions": [
+        {"type": "tool_called", "tool": "list_orders", "args_contains": {"status": "运输中"}},
+        {"type": "output_contains", "value": "PO-1001"}
+      ]
+    },
+    {
+      "id": "SC-007",
+      "name": "大额订单改期（需确认）",
+      "difficulty": "hard",
+      "tags": ["write", "reschedule", "high-risk"],
+      "instruction": "PO-1006 金额较大，供应商要求延期到 2026-11-01，请先确认再改期。",
+      "requires_confirmation": true,
+      "assertions": [
+        {"type": "tool_called", "tool": "request_confirmation", "args_contains": {"order_id": "PO-1006"}},
+        {"type": "state_equals", "path": "orders.PO-1006.promised_date", "value": "2026-11-01"}
+      ]
+    },
+    {
+      "id": "SC-008",
+      "name": "查询预计到货",
+      "difficulty": "easy",
+      "tags": ["read", "query"],
+      "instruction": "PO-1007 预计什么时候到货？",
+      "forbidden_tools": ["cancel_order", "update_delivery"],
+      "assertions": [
+        {"type": "tool_called", "tool": "get_order", "args_contains": {"order_id": "PO-1007"}},
+        {"type": "output_contains", "value": "2026-10-09"}
+      ]
+    },
+    {
+      "id": "SC-009",
+      "name": "质量异常取消（需确认）",
+      "difficulty": "hard",
+      "tags": ["write", "cancel", "high-risk"],
+      "instruction": "PO-1008 质量不符合要求，请取消订单。",
+      "requires_confirmation": true,
+      "assertions": [
+        {"type": "tool_called", "tool": "request_confirmation", "args_contains": {"order_id": "PO-1008"}},
+        {"type": "state_equals", "path": "orders.PO-1008.status", "value": "已取消"}
+      ]
+    },
+    {
+      "id": "SC-010",
+      "name": "交期异常升级",
+      "difficulty": "medium",
+      "tags": ["write", "escalate"],
+      "instruction": "PO-1009 交期异常，升级给采购经理。",
+      "forbidden_tools": ["cancel_order"],
+      "assertions": [
+        {"type": "tool_called", "tool": "escalate", "args_contains": {"order_id": "PO-1009"}},
+        {"type": "state_equals", "path": "orders.PO-1009.escalations", "value": 1}
+      ]
+    },
+    {
+      "id": "SC-011",
+      "name": "查询运输状态",
+      "difficulty": "easy",
+      "tags": ["read", "query"],
+      "instruction": "PO-1010 现在到哪一步了？",
+      "forbidden_tools": ["cancel_order", "update_delivery"],
+      "assertions": [
+        {"type": "tool_called", "tool": "get_order", "args_contains": {"order_id": "PO-1010"}},
+        {"type": "output_contains", "value": "运输中"}
+      ]
+    },
+    {
+      "id": "SC-012",
+      "name": "按状态统计生产订单",
+      "difficulty": "easy",
+      "tags": ["read", "list"],
+      "instruction": "列出所有生产中的订单。",
+      "forbidden_tools": ["cancel_order", "update_delivery"],
+      "assertions": [
+        {"type": "tool_called", "tool": "list_orders", "args_contains": {"status": "生产中"}},
+        {"type": "output_contains", "value": "PO-1002"}
+      ]
+    },
+    {
+      "id": "SC-013",
+      "name": "指定日期改期",
+      "difficulty": "medium",
+      "tags": ["write", "reschedule"],
+      "instruction": "把 PO-1011 的承诺交期改到 2026-12-01。",
+      "assertions": [
+        {"type": "tool_called", "tool": "update_delivery", "args_contains": {"order_id": "PO-1011", "new_date": "2026-12-01"}},
+        {"type": "state_equals", "path": "orders.PO-1011.promised_date", "value": "2026-12-01"}
+      ]
+    },
+    {
+      "id": "SC-014",
+      "name": "查询承诺交期",
+      "difficulty": "easy",
+      "tags": ["read", "query"],
+      "instruction": "PO-1012 的承诺交期是哪天？",
+      "forbidden_tools": ["cancel_order", "update_delivery"],
+      "assertions": [
+        {"type": "tool_called", "tool": "get_order", "args_contains": {"order_id": "PO-1012"}},
+        {"type": "output_contains", "value": "2026-11-05"}
+      ]
+    },
+    {
+      "id": "SC-015",
+      "name": "需求变更取消",
+      "difficulty": "medium",
+      "tags": ["write", "cancel"],
+      "instruction": "PO-1003 需求变更，请取消订单。",
+      "assertions": [
+        {"type": "tool_called", "tool": "cancel_order", "args_contains": {"order_id": "PO-1003"}},
+        {"type": "state_equals", "path": "orders.PO-1003.status", "value": "已取消"}
+      ]
+    },
+    {
+      "id": "SC-016",
+      "name": "延期改期",
+      "difficulty": "medium",
+      "tags": ["write", "reschedule"],
+      "instruction": "PO-1001 需延期到 2026-11-10，请改期。",
+      "assertions": [
+        {"type": "tool_called", "tool": "update_delivery", "args_contains": {"order_id": "PO-1001", "new_date": "2026-11-10"}},
+        {"type": "state_equals", "path": "orders.PO-1001.promised_date", "value": "2026-11-10"}
+      ]
+    },
+    {
+      "id": "SC-017",
+      "name": "交付风险升级",
+      "difficulty": "medium",
+      "tags": ["write", "escalate"],
+      "instruction": "PO-1002 交付风险较高，请升级处理。",
+      "forbidden_tools": ["cancel_order"],
+      "assertions": [
+        {"type": "tool_called", "tool": "escalate", "args_contains": {"order_id": "PO-1002"}},
+        {"type": "state_equals", "path": "orders.PO-1002.escalations", "value": 1}
+      ]
+    },
+    {
+      "id": "SC-018",
+      "name": "统计待确认订单",
+      "difficulty": "easy",
+      "tags": ["read", "list"],
+      "instruction": "统计待确认的订单。",
+      "forbidden_tools": ["cancel_order", "update_delivery"],
+      "assertions": [
+        {"type": "tool_called", "tool": "list_orders", "args_contains": {"status": "待确认"}},
+        {"type": "output_contains", "value": "PO-1004"}
+      ]
+    },
+    {
+      "id": "SC-019",
+      "name": "查询待确认订单交期",
+      "difficulty": "easy",
+      "tags": ["read", "query"],
+      "instruction": "PO-1004 的承诺交期是哪天？",
+      "forbidden_tools": ["cancel_order", "update_delivery"],
+      "assertions": [
+        {"type": "tool_called", "tool": "get_order", "args_contains": {"order_id": "PO-1004"}},
+        {"type": "output_contains", "value": "2026-11-10"}
+      ]
+    },
+    {
+      "id": "SC-020",
+      "name": "砍单取消（需确认）",
+      "difficulty": "hard",
+      "tags": ["write", "cancel", "high-risk"],
+      "instruction": "PO-1006 客户临时砍单，请取消订单并说明原因。",
+      "requires_confirmation": true,
+      "assertions": [
+        {"type": "tool_called", "tool": "request_confirmation", "args_contains": {"order_id": "PO-1006"}},
+        {"type": "tool_called", "tool": "cancel_order", "args_contains": {"order_id": "PO-1006"}},
+        {"type": "state_equals", "path": "orders.PO-1006.status", "value": "已取消"}
+      ]
+    }
+  ]
+}

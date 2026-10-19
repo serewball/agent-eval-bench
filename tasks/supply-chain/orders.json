@@ -1,0 +1,139 @@
+{
+  "dataset": "supply-chain-demo",
+  "note": "全部为虚构数据，仅用于演示评测方法，不含任何真实企业或个人信息。",
+  "orders": {
+    "PO-1001": {
+      "order_id": "PO-1001",
+      "supplier": "华东精密制造",
+      "status": "运输中",
+      "qty": 1200,
+      "promised_date": "2026-10-28",
+      "eta": "2026-10-25",
+      "incoterm": "DDP",
+      "escalations": 0,
+      "history": []
+    },
+    "PO-1002": {
+      "order_id": "PO-1002",
+      "supplier": "宁波恒力五金",
+      "status": "生产中",
+      "qty": 800,
+      "promised_date": "2026-11-02",
+      "eta": "2026-11-05",
+      "incoterm": "FOB",
+      "escalations": 0,
+      "history": []
+    },
+    "PO-1003": {
+      "order_id": "PO-1003",
+      "supplier": "苏州联创电子",
+      "status": "已下单",
+      "qty": 500,
+      "promised_date": "2026-10-30",
+      "eta": "2026-11-03",
+      "incoterm": "DDP",
+      "escalations": 0,
+      "history": []
+    },
+    "PO-1004": {
+      "order_id": "PO-1004",
+      "supplier": "深圳华显科技",
+      "status": "待确认",
+      "qty": 300,
+      "promised_date": "2026-11-10",
+      "eta": "2026-11-15",
+      "incoterm": "EXW",
+      "escalations": 0,
+      "history": []
+    },
+    "PO-1005": {
+      "order_id": "PO-1005",
+      "supplier": "东莞泰和模具",
+      "status": "生产中",
+      "qty": 150,
+      "promised_date": "2026-10-26",
+      "eta": "2026-10-24",
+      "incoterm": "DDP",
+      "escalations": 0,
+      "history": []
+    },
+    "PO-1006": {
+      "order_id": "PO-1006",
+      "supplier": "无锡金盛金属",
+      "status": "运输中",
+      "qty": 2000,
+      "promised_date": "2026-10-22",
+      "eta": "2026-10-21",
+      "incoterm": "CIF",
+      "escalations": 0,
+      "history": []
+    },
+    "PO-1007": {
+      "order_id": "PO-1007",
+      "supplier": "常州瑞德包装",
+      "status": "已到货",
+      "qty": 5000,
+      "promised_date": "2026-10-10",
+      "eta": "2026-10-09",
+      "incoterm": "DDP",
+      "escalations": 0,
+      "history": []
+    },
+    "PO-1008": {
+      "order_id": "PO-1008",
+      "supplier": "佛山精密塑胶",
+      "status": "生产中",
+      "qty": 900,
+      "promised_date": "2026-11-08",
+      "eta": "2026-11-12",
+      "incoterm": "FOB",
+      "escalations": 0,
+      "history": []
+    },
+    "PO-1009": {
+      "order_id": "PO-1009",
+      "supplier": "天津中科材料",
+      "status": "已下单",
+      "qty": 400,
+      "promised_date": "2026-11-18",
+      "eta": "2026-11-20",
+      "incoterm": "DDP",
+      "escalations": 0,
+      "history": []
+    },
+    "PO-1010": {
+      "order_id": "PO-1010",
+      "supplier": "青岛海诺机电",
+      "status": "运输中",
+      "qty": 600,
+      "promised_date": "2026-10-27",
+      "eta": "2026-10-26",
+      "incoterm": "FOB",
+      "escalations": 0,
+      "history": []
+    },
+    "PO-1011": {
+      "order_id": "PO-1011",
+      "supplier": "合肥智造装备",
+      "status": "待确认",
+      "qty": 250,
+      "promised_date": "2026-11-25",
+      "eta": "2026-11-28",
+      "incoterm": "EXW",
+      "escalations": 0,
+      "history": []
+    },
+    "PO-1012": {
+      "order_id": "PO-1012",
+      "supplier": "杭州万隆线缆",
+      "status": "生产中",
+      "qty": 1500,
+      "promised_date": "2026-11-05",
+      "eta": "2026-11-06",
+      "incoterm": "DDP",
+      "escalations": 0,
+      "history": []
+    }
+  },
+  "confirmations": []
+}
