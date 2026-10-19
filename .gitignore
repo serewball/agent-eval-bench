@@ -8,3 +8,4 @@ reports/
 .DS_Store
 Thumbs.db
 *.egg-info/
+ci_win.zip
