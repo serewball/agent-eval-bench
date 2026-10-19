@@ -199,6 +199,16 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: List[str] | None = None) -> int:
+    # 报告里包含中文：英文 locale 的 Windows（如 GitHub Actions runner）默认
+    # stdout 编码是 cp1252，print 中文会 UnicodeEncodeError。这里强制 UTF-8，
+    # 与报告文件的编码保持一致。
+    for stream in (sys.stdout, sys.stderr):
+        if stream and hasattr(stream, "reconfigure"):
+            try:
+                stream.reconfigure(encoding="utf-8", errors="replace")
+            except (ValueError, OSError):  # 已被重定向到非文本流时忽略
+                pass
+
     parser = build_parser()
     args = parser.parse_args(argv)
 
