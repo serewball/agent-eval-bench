@@ -14,11 +14,10 @@ import json
 import os
 import random
 import re
-import urllib.error
-import urllib.request
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
+from .client import chat
 from .schema import Task
 
 
@@ -269,23 +268,6 @@ class OpenAIAgent(Agent):
     def reset(self, seed: int) -> None:
         return None
 
-    def _post(self, payload: Dict[str, Any]) -> str:
-        request = urllib.request.Request(
-            f"{self.base_url}/chat/completions",
-            data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {self.api_key}",
-            },
-            method="POST",
-        )
-        try:
-            with urllib.request.urlopen(request, timeout=self.timeout) as response:
-                return response.read().decode("utf-8")
-        except urllib.error.HTTPError as exc:
-            body = exc.read().decode("utf-8", errors="replace")
-            raise RuntimeError(f"模型接口返回 {exc.code}: {body[:500]}") from exc
-
     def _messages(self, task: Task, history: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         messages: List[Dict[str, Any]] = [
             {"role": "system", "content": self.SYSTEM_PROMPT},
@@ -318,13 +300,15 @@ class OpenAIAgent(Agent):
         return messages
 
     def next_step(self, task: Task, history: List[Dict[str, Any]]) -> Step:
-        payload = {
-            "model": self.model,
-            "messages": self._messages(task, history),
-            "tools": self.tool_specs,
-            "temperature": self.temperature,
-        }
-        data = json.loads(self._post(payload))
+        data = chat(
+            self._messages(task, history),
+            model=self.model,
+            base_url=self.base_url,
+            api_key=self.api_key,
+            tools=self.tool_specs,
+            temperature=self.temperature,
+            timeout=self.timeout,
+        )
         message = data["choices"][0]["message"]
 
         calls: List[ToolCall] = []

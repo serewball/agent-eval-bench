@@ -43,6 +43,12 @@ python -m evalbench demo
 python -m evalbench run --tasks tasks/supply-chain/tasks.json \
                         --state tasks/supply-chain/orders.json \
                         -n 10 -k 5 --out reports
+
+# 校准语义判分器（Cohen's kappa）
+python -m evalbench calibrate
+
+# 用语义判分重跑已有结果，并与规则断言对照
+python -m evalbench judge
 ```
 
 输出：
@@ -89,6 +95,43 @@ python -m evalbench run --tasks tasks/supply-chain/tasks.json \
 | 平均步数 | 路径效率，异常升高通常意味着反复试错 |
 | 平均 token / 成本 | 端到端花费，按可配置单价估算 |
 | P95 延迟 | 尾延迟，比均值更能反映用户体验 |
+
+---
+
+## 判分器校准（LLM-as-Judge）
+
+规则断言只能校验"状态对不对"。回答的完整性、是否如实说明失败，只能靠语义评判。
+但**判分器本身也会错**，所以它必须先被校准才能上岗：
+
+```bash
+python -m evalbench calibrate --judge llm \
+    --base-url http://127.0.0.1:8001/v1 --model your-model
+```
+
+内置 mock 判分器的校准结果（16 条人工金标）：
+
+```
+ 金标样本      : 16
+ 简单一致率    :  93.8%
+ Cohen's kappa : 0.846   （阈值 0.70）
+ 结论          : 可用于放量
+```
+
+为什么看 kappa 而不是一致率：当通过率本身偏离 50%（比如 80% 的答案都是好的），
+随便全判"通过"也有一致率 80%。kappa 扣掉了这部分随机一致，所以更适合作为放量依据。
+经验阈值 **κ > 0.7**；换模型或改 rubric 后必须重新校准，不能沿用旧值。
+
+`judge` 子命令则把两种口径摆在一起看：
+
+```
+ 规则通过率    :  76.0%
+ 判分通过率    :  85.0%
+ 一致率        :  91.0%
+ Cohen's kappa :  0.717
+```
+
+分歧样本比总分更有信息量：规则过、判分不过，多半是回答漏了关键信息；
+规则不过、判分过，说明判分器被"看起来完整但事实错误"的回答骗了。
 
 ---
 
@@ -167,11 +210,14 @@ LangGraph、AutoGen 已经够多了。评测工具的价值在于**中立**—�
 - 失败归因是启发式规则（禁止调用 > 参数不符 > 缺少确认 > 首个写操作），不是轨迹模型推理。
 - 断言覆盖最终状态与关键工具调用，**不评估中间推理质量**。
 - 数据集为虚构供应链场景，仅用于演示方法论，不代表真实业务分布。
+- `MockJudge` 只是文本启发式占位实现，用于离线演示校准流程，不代表真实 LLM 判分质量。
+- 真实判分必须先用人工金标集校准（`calibrate`），kappa 达标再接入回归。
 - 没有并发调度，串行执行；200 次 mock 运行 < 1 秒，真实模型请按预算调整 `n`。
 
 ## Roadmap
 
-- [ ] LLM-as-Judge 判分（rubric + 人工金标校准 kappa）
+- [x] LLM-as-Judge 判分（rubric + 人工金标校准 kappa）
+- [ ] 判分器多模型投票（降低单模型偏见）
 - [ ] 并发执行与断点续跑
 - [ ] 与 CI 集成，回归对比上一次基线
 - [ ] 轨迹回放视图（按步骤查看 observation）
