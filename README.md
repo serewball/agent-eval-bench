@@ -4,7 +4,7 @@
   <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-blue">
   <img alt="deps" src="https://img.shields.io/badge/deps-zero%20dependency-brightgreen">
   <img alt="license" src="https://img.shields.io/badge/license-MIT-green">
-  <img alt="CI" src="https://github.com/<your-name>/agent-eval-bench/workflows/CI/badge.svg">
+  <img alt="CI" src="https://github.com/serewball/agent-eval-bench/workflows/CI/badge.svg">
 </p>
 
 轻量级 Agent 评测台：喂进你的任务集，跑出 **Pass@k / Pass^k / 过程指标 / 成本账单 / 失败归因**。
@@ -44,7 +44,7 @@ Pass^5 = 38.6%     ← k 条轨迹全部通过（业务可靠性）
 零依赖，标准库即可运行（Python ≥ 3.10）：
 
 ```bash
-git clone https://github.com/<your-name>/agent-eval-bench.git
+git clone https://github.com/serewball/agent-eval-bench.git
 cd agent-eval-bench
 
 # 跑 mock 基线，10 次采样 / k=5
