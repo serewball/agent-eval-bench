@@ -121,6 +121,7 @@ n == k 时，`C(n-c, k) / C(n, k)` 只有当 c=0（全失败）时才非零，�
 | 3 | **判分器被骗** | 判分通过率比规则高 9pt | 没有轨迹上下文时，"表面完整但实体错误"的回答能骗过判分器 | 双口径对照 + 分歧样本人工复核 + kappa 校准 |
 | 4 | **消息顺序错误** | 接真实模型必报 400 | tool 消息排在了 assistant(tool_calls) 之前，违反 OpenAI 消息格式 | 调整为 assistant → tool，并加了轨迹协议单测锁死顺序 |
 | 5 | **P95 退化为最大值** | n=10 时 P95 恒等于最大延迟 | 最近邻取整的分位数近似 | 改线性插值（与 numpy linear 口径一致），报告同时看均值 |
+| 6 | **英文 Windows 跑挂** | CI 的 Windows job 全挂在 demo 步骤 | 英文 locale 下 stdout 默认 cp1252，print 中文抛 UnicodeEncodeError；本机中文 GBK 掩盖了问题 | CLI 入口强制 stdout/stderr UTF-8 + CI 设 PYTHONIOENCODING 兜底，四平台 CI 全绿 |
 
 **坑 1 的追问**：你怎么发现采样相关性的？→ 观察 demo 结果时发现同一轮 20 个任务要么全过要么全挂，Pass^k 永远是 0，这和"30% 失误率"的预期完全不符，定位到随机数生成器的共享状态。
 
